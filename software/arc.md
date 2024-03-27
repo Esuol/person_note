@@ -4,7 +4,7 @@
 
 - Boost
   - 打开方式
-    - 左上角 URL，打开 扩展栏，New Boost
+    - 左上角 URL，打开 扩展栏，New Boost Boost
     - 左下角 新建，New Boost
   - 自定义主题
   - 自定义 FontSize、FontFamily
@@ -53,7 +53,7 @@
 - Folder
   - Folder Peek
   - Folder Preview
-  
+
 ### 快捷键配置
 
 - C -> S: Toggle Pin Tab
