@@ -41,3 +41,35 @@ assert!(!slab.contains(key));
 3. **对象池**：你可以使用 slab 创建一个对象池。当需要一个对象时，你可以从 slab 中获取一个已经分配的对象，而不是创建一个新的对象。当对象不再需要时，你可以将它放回 slab，而不是销毁它。
 
 总的来说，任何需要高效地管理多个对象的场景都可以考虑使用 slab 数据结构。
+
+### slab 数据结构如何处理并发访问？
+
+`slab` 数据结构本身并不提供并发访问的支持。如果你需要在多线程环境中使用 `slab`，你需要使用某种同步机制来保护它，例如互斥锁（`Mutex`）或读写锁（`RwLock`）。
+
+以下是一个使用 `std::sync::Mutex` 保护 `slab::Slab` 的例子：
+
+```rust
+use slab::Slab;
+use std::sync::{Arc, Mutex};
+
+let slab = Arc::new(Mutex::new(Slab::new()));
+
+let slab_clone = Arc::clone(&slab);
+std::thread::spawn(move || {
+    let mut slab = slab_clone.lock().unwrap();
+    let key = slab.insert("hello");
+    println!("inserted at key {}", key);
+});
+
+let slab_clone = Arc::clone(&slab);
+std::thread::spawn(move || {
+    let slab = slab_clone.lock().unwrap();
+    if let Some(value) = slab.get(0) {
+        println!("value at key 0: {}", value);
+    }
+});
+```
+
+在这个例子中，我们创建了一个 `Mutex` 来保护 `Slab`。在每个线程中，我们首先获取锁，然后才访问 `Slab`。
+
+请注意，这只是一个基本的例子。在实际使用中，你需要根据你的具体需求选择合适的同步机制。例如，如果你的工作负载主要是读取操作，你可能会选择 `RwLock` 而不是 `Mutex`，因为 `RwLock` 允许多个线程同时读取数据。
